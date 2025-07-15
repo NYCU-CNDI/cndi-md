@@ -66,6 +66,49 @@ PFCP 是 5G 核心網路中一個非常重要的協定，它在 SMF（控制平�
 
 SBA 和 SBI 的設計大大提高了網路的靈活性、可擴展性和可維護性。
 
+## 使用 Wireshark 分析封包
+
+### SCTP (Stream Control Transmission Protocol)
+
+SCTP 定義在 RFC 4960 中，是一種面向連接的協定，主要用於在 IP 網路上傳輸訊息。它支援多個流（Streams）和多宿主（Multi-homing），適合用於需要高可靠性和順序保證的應用。
+- 不是使用資料報（datagrams）或區段（segments），SCTP 使用的是「區塊」（Chunks）。
+- 區塊(Chunk)：SCTP 封包中的資訊單元。區塊可以包含用戶資料或 SCTP 控制資料。
+- 多個區塊可以被打包在一個 SCTP 封包內，直到達到 MTU 大小為止，INIT、INIT ACK 和 SHUTDOWN COMPLETE 區塊除外。
+- 端點(Endpoint)：SCTP 封包的邏輯發送者/接收者。在多宿主主機上，SCTP 端點對其對等端表現為一組可用的目的地傳輸位址（可發送 SCTP 封包的位址）和一組可用的來源傳輸位址（可接收 SCTP 封包的位址）的組合。
+- SCTP 使用「串流」(stream) 作為傳送有序應用訊息的邏輯通道。串流是單向的。
+
+![alt text](./assets/2-1.png)
+
+- 多宿主（Multihoming）可以在 INIT ACK 階段建立。
+- 這就是我們如何從基地台（Cell Site）到 AMF/MME 動態建立備援路徑。
+- 備援路徑會啟動心跳（heart beat）機制。
+
+#### 選擇性確認（Selective Ack's）
+
+![](./assets/2-2.png)
+
+- 確認訊息會攜帶一方已接收到的所有傳輸序列號碼（Transmission Sequence Number, TSN）。
+- 也就是說，有一個累積 TSN 確認值（Cumulative TSN Ack value），表示在接收端已成功重組的所有資料。
+- 還有間隙區塊（Gap Blocks），用來指示哪些資料區塊段已到達，而中間有些資料區塊遺失。
+
+#### 路徑監控（Path Monitoring）
+- HEARTBEAT 區塊會在所有路徑上發送。每個 HEARTBEAT 區塊都必須由 HEARTBEAT-ACK 區塊進行確認。
+- 每個路徑都被分配一個狀態：主動（active）或非主動（inactive）。
+- 當心跳在特定時間內未被確認的事件數量，或重傳事件數量超過某個可配置的限制時，對等端點會被視為不可達，且關聯將透過 ABORT 區塊終止。
+
+:::info
+🤔 Bonus（第一個成功答題的人總成績 +1 分）
+設定 free5GC（AMF）令其使用 SCTP multi-homing 功能，且在不刻意送出 Abort 封包的前提下觸發 **當心跳在特定時間內未被確認的事件數量，或重傳事件數量超過某個可配置的限制時，對等端點會被視為不可達，且關聯將透過 ABORT 區塊終止。** 所描述的狀況。
+:::
+
+### GTP
+
+![](./assets/2-3.png)
+> 出處：https://docs.magmaindia.org/Free5gc_5gCore/upf/upf.html
+
+GTP（GPRS Tunneling Protocol）是一種用於在移動網路中傳輸用戶數據的協定。它主要用於 4G 和 5G 網路中資料層的傳輸。
+UPF 使用的是 GTP-U v1 協定，N3、N6 和 N9 接口皆使用 GTP-U v1 協定來傳輸用戶數據。GTP-U 協定允許在 UPF 和其他網路元件之間建立隧道，以便在不同的 PDU 會話之間轉發數據。
+
 ---
 
 ## 本週作業
