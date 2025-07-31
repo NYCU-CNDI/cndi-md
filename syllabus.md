@@ -21,11 +21,11 @@ https://hackmd.io/@4GQQ/ry89gJjTd
 | 5 | 5G Procedures |  | 使用 UERANSIM 觸發常用場景，並且使用 wireshark 解說。 |
 | 6 | 5G Deployment - 1 | [[1]](https://hackmd.io/@cndi2025/H1XDHR28gx) [[2]](https://github.com/ianchen0119/introduction-to-k8s) | 使用 Docker 與 Kubernetes 部署核心網路，以及討論最佳實踐相關議題。 |
 | 7 | 5G Deployment - 2 | [[1]](https://hackmd.io/@cndi2025/H1XDHR28gx) [[2]](https://github.com/ianchen0119/introduction-to-k8s) | 使用 Docker 與 Kubernetes 部署核心網路，以及討論最佳實踐相關議題。 |
-| 8 | 5GC development - 1 |  | 網路元件架構、套件管理、Design Pattern 應用 |
-| 9 | 5GC development - 2 |  | OpenAPI Spec、WebUI、POSTMAN |
-| 10 | 5GC development - 3 |  | go test、gock、mock、test framework |
-| 11 | 5GC development - 4 |  | Data Plane development/debugging |
-| 12 | 5GC development - 5 |  | eBPF |
+| 8 | 5GC development - 1 |  |  |
+| 9 | 5GC development - 2 |  |  |
+| 10 | 5GC development - 3 |  |  |
+| 11 | 5GC development - 4 |  |  |
+| 12 | 5GC development - 5 |  |  |
 | 13 | Use Case sharing |  |  |
 | 14 | Use Case sharing |  |  |
 | 15 | Final Project |  |  |
