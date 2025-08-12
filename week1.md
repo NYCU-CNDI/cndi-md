@@ -297,6 +297,15 @@ CHF 透過 Nchf 介面為其他網路元件提供計費服務，確保營運商�
 此外，國外學者也有研究基於 gRPC 的 SBI 服務，詳細資訊可參考 [SBA-gRPC-5G](https://github.com/iithnewslab/SBA-gRPC-5G/blob/master/Presentation_Netsoft19_gRPC_5G.pdf)。
 :::
 
+![alt text](assets/1-1.png)
+*圖：SBI 呼叫流程：資源操作*
+
+![alt text](assets/1-2.png)
+*圖：SBI 呼叫流程：訂閱服務*
+
+![alt text](assets/1-3.png)
+*圖：SBI 呼叫流程：事件通知*
+
 ### 實際案例：AMF 尋找 SMF
 
 若 UE 透過基地台向 AMF 請求建立會議（PDU Session），AMF 要如何在不知道 SMF 確切位址的情況下找到它呢？
