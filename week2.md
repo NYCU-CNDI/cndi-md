@@ -1,122 +1,163 @@
-# Week 2: Protocol Stack
+# Week 2: 5G Network Concepts & Network Identifier
 
-## 協定堆疊 (Protocol Stack)
+## 課程目標
 
-在 5G 網路中，UE（使用者設備）與網路之間的通訊以及核心網路內部不同網路功能（NF）之間的通訊，都依賴於一組定義好的協定。這些協定共同構成了 5G 的協定堆疊。本週我們將探討幾個關鍵的協定，它們是實現 5G 各種服務的基礎。
+- 從需求面出發了解網路切片
+- 認識常見的 Identifier
+- 認識 5G 核網的新功能（ULCL、Traffic Influence）
 
----
+## 網路切片（Network Slicing）
 
-### NGAP (Next-Generation Application Protocol)
+![](https://lh3.googleusercontent.com/proxy/Xp1w9FybTH3KtR2ucEslBH_d8JtM9-BYOHcBREgOAdnX_LersVljVPfNMznA-N8ebvfAcPd8xid87EkPNJle5X_qRw)
+*圖一：5G 的三大應用場景*
 
-NGAP 是在 5G 基地台（gNB）和 AMF（存取與行動管理功能）之間使用的控制平面協定。它取代了 4G 中的 S1AP 協定。
+ITU 在 2015 年 9 月時正式定義了 5G 的三大應用場景：
+- eMBB
+- eMTC
+- URLLC
 
-- **主要功能**:
-    - **UE 上下文管理 (UE Context Management)**: 建立、修改和釋放 UE 在 AMF 和 gNB 中的上下文資訊。
-    - **PDU 會話管理 (PDU Session Management)**: 管理 UE 的 PDU 會話，例如建立和釋放與 UPF 連接所需的資源。
-    - **行動性管理 (Mobility Management)**: 處理 UE 在不同 gNB 之間移動時的切換（Handover）程序。
-    - **傳輸 NAS 訊息**: 在 UE 和 AMF 之間透明地傳輸 NAS 訊息。
 
-![NGAP Interface](https://www.researchgate.net/profile/Walter-Feess/publication/338822566/figure/fig2/AS:851882912841728@1580117925433/5G-System-control-plane-and-user-plane-protocol-stacks-The-control-plane-protocol-stack.jpg)
-*圖：控制平面協定堆疊，顯示 NGAP 位於 gNB 與 AMF 之間*
+為了因應複雜的使用場景，5G 網路在設計時導入了「網路切片」的概念，用白話文來說就是將一個實體網路切分成多個邏輯網路，為這些邏輯網路賦予不同的定位以及給予不同的資源，使 5G 網路有能力處理不同的業務需求。
 
----
+![](https://www.tech-invite.com/3m23/img/tinv-23-003-28.4.2-1.gif)
+*圖二：S-NSSAI，出處 [tech-invite](https://www.tech-invite.com/3m23/toc/tinv-3gpp-23-003_zi.html)。*
 
-### NAS (Non-Access Stratum)
+- SST
+    - 1: eMMB
+    - 2: URLLC
+    - 3: eMTC
+    - 5 ~ 127: TBD
+    - 128 ~ 255: Operator specific
+- SD (optional)
 
-NAS 是 UE 和 AMF 之間直接通訊的協定，它「透明地」穿過基地台（gNB）。"Non-Access Stratum" 的意思是它與存取技術（如無線電）無關。
 
-- **主要功能**:
-    - **註冊管理 (Registration Management)**: UE 開機後向網路註冊。
-    - **連線管理 (Connection Management)**: 建立和釋放與網路的信令連線。
-    - **行動性管理 (Mobility Management)**: 追蹤 UE 的位置（Tracking Area Update）。
-    - **會話管理 (Session Management)**: 建立、修改和釋放 PDU 會話。
+![](https://user-images.githubusercontent.com/42661015/179144604-4f5b1f17-1d46-4621-bec5-ce62df22ed24.png)
+*圖三：網路切片架構*
 
-NAS 訊息分為兩大類：
-1.  **5GMM (5G Mobility Management)**: 負責行動性相關程序。
-2.  **5GSM (5G Session Management)**: 負責 PDU 會話相關程序。
 
----
+![](https://user-images.githubusercontent.com/42661015/179154292-c631635b-5bd9-4a8d-852a-0a5bdd5e4ca8.png)
 
-### PFCP (Packet Forwarding Control Protocol)
+*圖四：參與網路切片之網路功能*
 
-PFCP 是 5G 核心網路中一個非常重要的協定，它在 SMF（控制平面）和 UPF（使用者平面）之間運作，實現了 CUPS（Control and User Plane Separation）架構。
+:::spoiler
+NSSAI 為 S-NSSAI 的集合，可以再細分成 5 種:
 
-- **主要功能**:
-    - **建立/修改/刪除 PDU 會話**: SMF 透過 PFCP 協定，指示 UPF 如何處理特定 PDU 會話的數據流。
-    - **安裝轉發規則 (Forwarding Rules)**: SMF 在 UPF 上安裝 Packet Detection Rules (PDRs)、Forwarding Action Rules (FARs) 等規則，告訴 UPF 如何識別、轉發、阻擋或緩存用戶數據。
-    - **報告使用情況**: UPF 可以向 SMF 報告數據使用量，用於計費。
+- Default S-NSSAI
+如果 UE 在 Registration Request 沒有攜帶 Allowed NSSAI，核心網路會使用 Default S-NSSAI 來為 UE 提供服務。
 
-這種分離使得使用者平面（UPF）可以根據流量需求靈活地部署在網路邊緣，以減少延遲，而控制平面（SMF）則可以集中部署。
+- Requested NSSAI
+請求夾帶的 NSSAI，也就是 UE 在 Registration Request 攜帶的 Allowed NSSAI。
 
----
+- Allowed NSSAI
+表示 UE 請求的 NSSAI 中，哪些 S-NSSAI (切片功能) 被核心網路允許了，核心網路會利用 Registration Accept 之中的 Allowed NSSAI IE 將資訊帶給 UE。
 
-### SBI (Service-Based Interface)
+- Rejected NSSAI
+被拒絕的 NSSAI，表示 UE 請求的 NSSAI 中，哪些 S-NSSAI 被核心網路拒絕了，核心網路會利用 Registration Accept 之中的 Rejected NSSAI IE 將資訊帶給 UE。
 
-5G 核心網路採用了服務化架構（Service-Based Architecture, SBA），其中每個網路功能（NF）都提供一組服務給其他 NF 使用。SBI 就是這些 NF 之間通訊的介面。
-
-- **技術基礎**:
-    - 基於 RESTful API，使用 HTTP/2 協定。
-    - 使用 JSON (JavaScript Object Notation) 作為數據格式。
-    - 每個 NF 都有一個 Profile，儲存在 NRF（NF Repository Function）中，包含了它提供的服務資訊。
-
-- **運作方式**:
-    1.  **NF 發現 (NF Discovery)**: 當一個 NF（例如 AMF）需要使用另一個 NF（例如 SMF）的服務時，它會先向 NRF 查詢，找到可用的 SMF 實例。
-    2.  **服務請求 (Service Request)**: AMF 向 SMF 發送一個 HTTP/2 請求（如 POST, GET, PUT）來觸發一項服務（例如，建立 PDU 會話）。
-    3.  **服務回應 (Service Response)**: SMF 處理請求後，回傳一個 HTTP/2 回應。
-
-SBA 和 SBI 的設計大大提高了網路的靈活性、可擴展性和可維護性。
-
-## 使用 Wireshark 分析封包
-
-### SCTP (Stream Control Transmission Protocol)
-
-SCTP 定義在 RFC 4960 中，是一種面向連接的協定，主要用於在 IP 網路上傳輸訊息。它支援多個流（Streams）和多宿主（Multi-homing），適合用於需要高可靠性和順序保證的應用。
-- 不是使用資料報（datagrams）或區段（segments），SCTP 使用的是「區塊」（Chunks）。
-- 區塊(Chunk)：SCTP 封包中的資訊單元。區塊可以包含用戶資料或 SCTP 控制資料。
-- 多個區塊可以被打包在一個 SCTP 封包內，直到達到 MTU 大小為止，INIT、INIT ACK 和 SHUTDOWN COMPLETE 區塊除外。
-- 端點(Endpoint)：SCTP 封包的邏輯發送者/接收者。在多宿主主機上，SCTP 端點對其對等端表現為一組可用的目的地傳輸位址（可發送 SCTP 封包的位址）和一組可用的來源傳輸位址（可接收 SCTP 封包的位址）的組合。
-- SCTP 使用「串流」(stream) 作為傳送有序應用訊息的邏輯通道。串流是單向的。
-
-![alt text](./assets/2-1.png)
-
-- 多宿主（Multihoming）可以在 INIT ACK 階段建立。
-- 這就是我們如何從基地台（Cell Site）到 AMF/MME 動態建立備援路徑。
-- 備援路徑會啟動心跳（heart beat）機制。
-
-#### 選擇性確認（Selective Ack's）
-
-![](./assets/2-2.png)
-
-- 確認訊息會攜帶一方已接收到的所有傳輸序列號碼（Transmission Sequence Number, TSN）。
-- 也就是說，有一個累積 TSN 確認值（Cumulative TSN Ack value），表示在接收端已成功重組的所有資料。
-- 還有間隙區塊（Gap Blocks），用來指示哪些資料區塊段已到達，而中間有些資料區塊遺失。
-
-#### 路徑監控（Path Monitoring）
-- HEARTBEAT 區塊會在所有路徑上發送。每個 HEARTBEAT 區塊都必須由 HEARTBEAT-ACK 區塊進行確認。
-- 每個路徑都被分配一個狀態：主動（active）或非主動（inactive）。
-- 當心跳在特定時間內未被確認的事件數量，或重傳事件數量超過某個可配置的限制時，對等端點會被視為不可達，且關聯將透過 ABORT 區塊終止。
-
-:::info
-🤔 Bonus（第一個成功答題的人總成績 +1 分）
-設定 free5GC（AMF）令其使用 SCTP multi-homing 功能，且在不刻意送出 Abort 封包的前提下觸發 **當心跳在特定時間內未被確認的事件數量，或重傳事件數量超過某個可配置的限制時，對等端點會被視為不可達，且關聯將透過 ABORT 區塊終止。** 所描述的狀況。
+- Configured NSSAI
+核心網路配置給 UE 使用的 NSSAI，UE 會知道核心網路有哪些 S-NSSAI 可用。
+核心網路會利用 Registration Accept 之中的 Configured NSSAI IE 將資訊帶給 UE。如果註冊後 UE 的配置有變化，則核心網路可通過 Configuration update command 通知 UE 更新。
 :::
 
-### GTP
+## 5GS 常見的 Identifier
 
-![](./assets/2-3.png)
-> 出處：https://docs.magmaindia.org/Free5gc_5gCore/upf/upf.html
+### Global Identifier
 
-GTP（GPRS Tunneling Protocol）是一種用於在移動網路中傳輸用戶數據的協定。它主要用於 4G 和 5G 網路中資料層的傳輸。
-UPF 使用的是 GTP-U v1 協定，N3、N6 和 N9 接口皆使用 GTP-U v1 協定來傳輸用戶數據。GTP-U 協定允許在 UPF 和其他網路元件之間建立隧道，以便在不同的 PDU 會話之間轉發數據。
+#### PLMN (Public Land Mobile Network) ID
+PLMN Id 由 MCC 以及 MNC 組成，每個電信營運商都會有自己專屬的 PLMN。
+以台灣這邊的業者來說，每個業者使用的 PLMN 都可以在 NCC 的[網站](https://www.ncc.gov.tw/chinese/files/14050/%E8%A1%8C%E5%8B%95%E7%B6%B2%E8%B7%AF%E8%AD%98%E5%88%A5%E7%A2%BC%E6%A0%B8%E9%85%8D%E7%8F%BE%E6%B3%81.pdf)上面找到。
 
----
+#### VPLMN & HPLMN
 
-## 本週作業
+V-PLMN（Visited PLMN）與 H-PLMN（Home PLMN），它們主要是用於漫遊的場景（你的電信商的 PLMN 是 H-PLMN，當地的網路提供商是 V-PLMN），在 3GPP TS 23.501 也可以看到漫遊的架構圖：
+![](https://i.imgur.com/vheV36N.png)
+*圖五：5G 漫遊架構圖*
 
-1.  **問題**:
-    - 請解釋 NGAP 和 NAS 協定之間的主要區別是什麼？為什麼需要這兩種不同的協定？
-    - CUPS 架構為什麼對 5G 網路很重要？PFCP 在其中扮演了什麼角色？
-    - 什麼是服務化架構 (SBA)？與傳統的點對點（Point-to-Point）介面相比，它有什麼優點？
+以上圖來說，我們的手機（UE）會透過基地台（RAN）接入到當地營運商的核心網路，而當地營運商會透過 N32 Interface 取得門號對應的訂閱用戶資料（Subscriber Data）以及相關的策略資料（AM/SM Policy）。
 
-2.  **實作**:
-    - (可選) 使用 Wireshark 捕獲一個 5G 裝置的網路流量（如果條件允許），嘗試過濾並識別出 NAS 訊息。觀察註冊（Registration）或 PDU 會話建立（PDU Session Establishment）過程中的訊息交換。
+#### MCC (Mobile Country Code)
+MCC 長度為三碼，用來表示國家。
+
+#### MNC (Mobile Network Code)
+MNC 長度為二或三碼，用來表示不同的電信業者。
+
+#### IMSI (International Mobile Subscriber Identity)
+在 5G 系統當中又稱為 PEI，由 PLMN ID + MSIN 組成：
+```
+[PLMN ID][MSIN]
+```
+其中，MSIN（Mobile Subscriber Identification Number）作為在一個 PLMN 下的識別號碼，每個訂閱用戶都有屬於自己的 MSIM。
+
+
+
+### UE Identifier
+
+#### GUAMI (Globally Unique AMF ID)
+GUAMI 可以幫助我們識別全球的 AMF，每一個 AMF 持有的 GUAMI 都是獨一無二的。 
+```
+[MCC][MNC][AMF Region ID][AMF Set ID][AMF Pointer]
+```
+- MCC (Mobile Country Code)
+- MNC (Mobile Network Code)
+- AMF Region ID
+- AMF Set ID
+- AMF Pointer
+
+#### 5G-TSMI (5G Temporary Mobile Subscriber Identity)
+
+5G-TMSI 是由 AMF 產生的，可以幫助我們識別 AMF 中的 UE。
+如果是用於 paging，因為已知 AMF，可以只使用 5G-TMSI 提高傳輸效率。
+
+#### SUPI (Subscription Permanent Identifier)
+是 5G 用戶的永久身份，在 2G - 4G 採用的是 IMSI (International Mobile Subscriber Identity)。
+
+
+#### SUCI (Subscription Concealed Identifier)
+使用 PLMN 的 Public Key 對 SUPI 加密產生 SUCI。
+
+#### 5G-GUTI
+當 UE 向核心網路完成註冊時，核心網路中的 AMF 會為 UE 分配 5G-GUTI，5G-GUTI 是核心網路分配給 UE 的臨時識別證。
+```
+[GUAMI][5G-TSMI]
+```
+
+:::spoiler
+AMF 在執行時期需要記載許多 N1/N2 相關的上下文，如：
+- AmfRan Context 紀錄 AMF 與 RAN 之間的狀態（NGAP），如：SupportedTAList、RanId、AnType、Connection。
+- RanUe Context 紀錄 RAN 與 UE 之間的狀態，如：Handover Context（Type、T-GNB、S-GNB）、RAN-UE-NGAP-ID、AMF-UE-NGAP-ID、TAI、AmfRan、AmfUe
+- AmfUe Context 紀錄 AMF 與 UE 之間的狀態（NAS），如：Security Context、Timer、UE Identifier、TimeZone、ServingNFs、SMContextList、RanUE Context
+
+在 free5GC/amf 的 source code 當中可以看見 AMF 如何處理當 UE 使用 GUTI 註冊的請求：
+```go
+func handleInitialUEMessageMain(ran *context.AmfRan,
+	message *ngapType.NGAPPDU,
+	rANUENGAPID *ngapType.RANUENGAPID,
+	nASPDU *ngapType.NASPDU,
+	userLocationInformation *ngapType.UserLocationInformation,
+	rRCEstablishmentCause *ngapType.RRCEstablishmentCause,
+	fiveGSTMSI *ngapType.FiveGSTMSI,
+	uEContextRequest *ngapType.UEContextRequest,
+) {
+    // ignore ...
+
+    // If id type is GUTI, since MAC can't be checked here (no amfUe context), the GUTI may not direct to the right amfUe.
+	// In this case, create a new amfUe to handle the following registration procedure.
+	isInvalidGUTI := (idType == "5G-GUTI")
+	amfUe, ok := findAmfUe(ran, id, idType)
+	if ok && !isInvalidGUTI {
+		// TODO: invoke Namf_Communication_UEContextTransfer if serving AMF has changed since
+		// last Registration Request procedure
+		// Described in TS 23.502 4.2.2.2.2 step 4 (without UDSF deployment)
+		ranUe.Log.Infof("find AmfUe [%q:%q]", idType, id)
+		ranUe.Log.Debugf("AmfUe Attach RanUe [RanUeNgapID: %d]", ranUe.RanUeNgapId)
+		ranUe.HoldingAmfUe = amfUe
+	}
+```
+:::
+
+#### MSISDN
+
+MSISDN（Mobile Subscriber ISDN Number）就是我們最常使用的手機門號。值得一提的是：對於核心網路來說，手機門號並不是必要的 IE（Information Element），在手機向核心網路進行註冊時，通常是使用 SUPI 或是核心網路分配的 5G-GUTI。
+
+
+https://leozzmc.github.io/posts/a05f1769.html#SUPI

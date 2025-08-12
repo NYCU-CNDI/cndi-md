@@ -1,9 +1,9 @@
-# 5G Network Functions 
-
+# Week 1: 5G Network Functions 
+<!-- 
 :::info
 Syllabus: https://timetable.nycu.edu.tw/?r=main/crsoutline&Acy=114&Sem=1&CrsNo=535607&lang=en
 :::
-
+ -->
 ## 課程目標
 
 - 認識核心網路
@@ -16,6 +16,8 @@ Syllabus: https://timetable.nycu.edu.tw/?r=main/crsoutline&Acy=114&Sem=1&CrsNo=5
 
 ![image](https://hackmd.io/_uploads/rkSQAiRMll.png)
 > Ref: https://www.scimonth.com.tw/archives/4130#google_vignette
+
+*圖：通訊網路架構，展示從手機接入一路至骨幹網路*
 
 核心網路是通訊網路的大腦，他負責管理用戶設備與基地台的連線狀態（這部分相當複雜，透過後續的章節我們會慢慢了解）以及用戶層資料的傳輸。
 
@@ -31,6 +33,8 @@ Syllabus: https://timetable.nycu.edu.tw/?r=main/crsoutline&Acy=114&Sem=1&CrsNo=5
 
 ![image](https://hackmd.io/_uploads/SkkRkhCGxg.png)
 > Ref: https://www.geeksforgeeks.org/5g-network-architecture/
+
+*圖：核心網路架構，可細分為控制平面與傳輸平面*
 
 對於公網來說，其實我們並不會察覺到核心網路的存在。人們在乎大概就是「有沒有吃到飽」、「基地台數量（覆蓋率）」、「我家附近的訊號強度」。
 但對於營運商（電信業者）來說，核心網路對他們就非常有感了，我們可以想像一下自己家是電信業者的話，我們會期待核心網路為我們提供什麼？
@@ -285,6 +289,8 @@ CHF 透過 Nchf 介面為其他網路元件提供計費服務，確保營運商�
 
 ![image](https://hackmd.io/_uploads/S1gzYsLQel.png)
 > Ref: https://www.researchgate.net/figure/G-Architecture-in-SBA-representation_fig2_328233142
+
+*圖：以服務為導向架構*
 
 :::info
 網路元件可以扮演服務消費者或服務生產者的角色。每個網路功能服務都透過基於服務的介面 (SBI) 公開其功能，該介面採用基於 HTTP/2 的、定義明確的 REST 介面。為了緩解 TCP 隊頭 (HOL) 阻塞問題，未來可能會使用快速 UDP 網際網路連線 (QUIC) 協定。
