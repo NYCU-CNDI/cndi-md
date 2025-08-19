@@ -18,7 +18,7 @@ https://hackmd.io/@4GQQ/ry89gJjTd
 | 2 | 5G Network Functions     | [[1]](https://hackmd.io/@cndi2025/B1CuTo0Gll)     | 介紹 5G 核心網路與常見的網路元件。     |
 | 3 | 5G Network Concepts & Network Identifier | [[1]](https://hackmd.io/@cndi2025/rkyMMm88xg) | 介紹核心網路常見功能的觀念，同時介紹常見的 network identifier。 |
 | 4 | Protocol Stack | [[1]](https://hackmd.io/@cndi2025/S1BM-mULgg) | 介紹 5G 核心網路的各種通訊協定與用途。 |
-| 5 | 5G Procedures |  | 使用 UERANSIM 觸發常用場景，並且使用 wireshark 解說。 |
+| 5 | 5G Procedures | [1](https://github.com/ianchen0119/cndi-md/blob/main/5g-procedures) | 使用 UERANSIM 觸發常用場景，並且使用 wireshark 解說。 |
 | 6 | 5G Deployment - 1 | [[1]](https://hackmd.io/@cndi2025/H1XDHR28gx) [[2]](https://github.com/ianchen0119/introduction-to-k8s) | 使用 Docker 與 Kubernetes 部署核心網路，以及討論最佳實踐相關議題。 |
 | 7 | 5G Deployment - 2 | [[1]](https://hackmd.io/@cndi2025/H1XDHR28gx) [[2]](https://github.com/ianchen0119/introduction-to-k8s) | 使用 Docker 與 Kubernetes 部署核心網路，以及討論最佳實踐相關議題。 |
 | 8 | 5GC development - 1 |  |  |

@@ -160,4 +160,78 @@ func handleInitialUEMessageMain(ran *context.AmfRan,
 MSISDN（Mobile Subscriber ISDN Number）就是我們最常使用的手機門號。值得一提的是：對於核心網路來說，手機門號並不是必要的 IE（Information Element），在手機向核心網路進行註冊時，通常是使用 SUPI 或是核心網路分配的 5G-GUTI。
 
 
+## ULCL (Uplink Classifier)
+
+ULCL 是 5G 核心網路中的一個重要功能，它允許在 UPF（User Plane Function）中對上行流量進行分類和路由。這項技術主要用於實現本地分流（Local Breakout）和邊緣運算（Edge Computing）等應用場景。
+
+### 主要功能
+
+- **流量分類（Traffic Classification）**：根據預定義的規則（如目的地 IP、應用類型等）對上行流量進行分類
+- **本地分流（Local Breakout）**：將特定流量直接從本地 UPF 分流到本地網路，而不需要回傳到中央的 UPF
+- **邊緣運算支援**：支援 MEC（Multi-access Edge Computing）場景，降低延遲並提高服務品質
+
+### 應用場景
+
+1. **企業專網**：企業內部流量可以直接在本地處理，提高效率
+2. **內容分發**：將熱門內容的請求分流到就近的 CDN 節點
+3. **IoT 應用**：物聯網設備的數據可以在邊緣節點進行處理
+
+![ULCL 架構示意圖](./assets/ulcl-architecture.png)
+*圖：ULCL 在 5G 網路中的部署架構*
+
+### 技術實現
+
+ULCL 功能透過 SMF（Session Management Function）進行控制，SMF 會向 UPF 下發相關的封包檢測規則（PDR, Packet Detection Rules）和轉發規則（FAR, Forwarding Action Rules），指示 UPF 如何處理不同類型的流量。
+
+## Traffic Influence
+
+Traffic Influence 是 5G 核心網路中用於優化流量路由和提升用戶體驗的功能。它允許應用服務提供商（ASP）或第三方應用程式影響用戶流量的路由決策。
+
+### 主要概念
+
+- **Traffic Influence Function（TIF）**：負責處理流量影響請求的網路功能
+- **Application Function（AF）**：向核心網路請求流量影響的應用功能
+- **Traffic Routing**：基於應用需求動態調整流量路由路徑
+
+### 運作機制
+
+1. **流量影響請求**：AF 透過 NEF（Network Exposure Function）向核心網路發送流量影響請求
+2. **策略決策**：PCF（Policy Control Function）根據請求和網路狀況制定流量路由策略
+3. **路由調整**：SMF 根據策略調整 UPF 的轉發規則，實現流量路由優化
+
+### 應用場景
+
+1. **內容分發優化**：
+   - CDN 服務商可以請求將用戶流量路由到最近的 CDN 節點
+   - 減少延遲，提升內容載入速度
+
+2. **遊戲加速**：
+   - 線上遊戲服務商可以請求優先路由和低延遲路徑
+   - 提供更好的遊戲體驗
+
+3. **企業服務**：
+   - 企業應用可以請求特定的服務品質保證
+   - 確保關鍵業務的網路性能
+
+### 技術架構
+
+```
+AF ←→ NEF ←→ PCF ←→ SMF ←→ UPF
+```
+
+- **AF**：提出流量影響需求
+- **NEF**：作為網路開放介面，處理外部請求
+- **PCF**：制定策略決策
+- **SMF**：執行流量控制
+- **UPF**：實際進行流量轉發
+
+### 優勢
+
+1. **動態優化**：能夠根據即時需求動態調整流量路由
+2. **服務差異化**：為不同應用提供差異化的網路服務
+3. **網路效率**：提高整體網路資源利用效率
+4. **用戶體驗**：改善終端用戶的服務體驗
+
+## Reference
+
 https://leozzmc.github.io/posts/a05f1769.html#SUPI
