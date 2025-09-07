@@ -153,10 +153,9 @@ AUSF 是 5G 核心網路中負責用戶認證的網路元件，對應於 4G EPS 
 
 - **用戶認證**：執行 5G-AKA（5G Authentication and Key Agreement）認證程序
 - **金鑰產生與管理**：產生並管理認證過程中需要的各種金鑰
-- **認證向量產生**：產生認證向量（Authentication Vector）供 AMF 使用
+- **認證向量產生**：產生認證向量（Authentication Vector，這裏指 5G Serving Environment Authentication Vector，由 RAND、 AUTN、HXRES* 組成）供 AMF 使用
 - **EAP 認證支援**：支援 EAP-AKA'（Extensible Authentication Protocol - Authentication and Key Agreement Prime）認證方法
 - **認證狀態管理**：維護用戶的認證狀態資訊
-- **安全錨點功能**：作為 UE 與網路之間的信任錨點
 - **漫遊認證**：在漫遊場景中與 Home AUSF 協作進行認證
 
 AUSF 與 UDM 緊密協作，從 UDM 獲取用戶的長期金鑰和認證資料。在認證過程中，AUSF 透過 Nausf 介面為 AMF 提供認證服務，確保只有合法的用戶能夠存取網路服務。
@@ -167,13 +166,19 @@ UE -> AMF -> AUSF -> UDM
             認證資料
 ```
 
+:::info
+- 
+AKA（Authentication and Key Agreement）是一種機制，它使行動設備和行 動網路營運商能夠驗證和散佈要在它們之間使用的共享密鑰。
+- Authentication 相關流程請參考 TS 33.501。
+:::
+
 ### UDM (Unified Data Management)
 
 UDM 是 5G 核心網路中的統一資料管理元件，整合了 4G EPS 中 HSS（Home Subscriber Server）的功能。UDM 負責管理用戶相關的各種資料，其主要功能包含：
 
 - **用戶身份管理**：管理 SUPI（Subscription Permanent Identifier）和 GPSI（Generic Public Subscription Identifier）
 - **訂閱資料管理**：儲存和管理用戶的訂閱資料，包括服務權限、QoS 設定等
-- **認證資料管理**：管理用戶的長期金鑰（K）和認證相關參數
+- **認證資料管理**：管理用戶的長期金鑰（K）和認證相關參數，如：5G Home Environment Authentication Vector（RAND、AUTN、XRES*、KAUSF）
 - **存取與移動性管理資料**：維護用戶的註冊狀態、位置資訊和 AMF 資訊
 - **會議管理資料**：管理 PDU Session 相關的訂閱資料和 SMF 選擇資訊
 - **隱私保護**：支援用戶身份隱私保護機制（SUPI 保護）
@@ -202,6 +207,41 @@ UDR 採用 RESTful API 介面，支援標準的 HTTP 方法（GET、POST、PUT�
 - **UDSF**：在某些部署中可能透過 UDSF 存取結構化資料
 
 UDR 的設計遵循資料與邏輯分離的原則，使得資料管理更加靈活和可擴展。
+
+### PCF (Policy Control Function)
+
+<!-- https://docs.oracle.com/en/industries/communications/cloud-native-core/2.2.0/pcf_user_guide/policy-control-function-services1.html#GUID-F57756CF-1506-4EB5-80FB-751FD1990F80 -->
+
+PCF 主要提供 UE 使用的策略，這些策略的種類包含但不限於會話管理、接取管理以及策略授權。
+
+#### 會話管理
+
+PCF 負責對 Service Data Flow 的 Session Management 實施策略控制。PCF 實作 N7 接口，以觸發 SMF 的會話管理策略，SMF 控制 UPF，它將從 PCF 接收的策略轉換為 UPF 能夠理解的一組指令/訊息後將其轉發給 UPF。
+
+Session Management Service 支援以下功能：
+
+- 與 QoS、計費、Gate Control、Service Flow detection、資料包路由和轉送、流量使用報告相關的策略決策的執行控制。
+- QoS、計費、門控、服務流偵測、封包路由和轉送以及流量計費和報告策略決策的執行可以根據策略類型在 UPF、無線接取網路 (RAN) 和用戶設備 (UE) 之間分配。
+
+#### 接取管理
+
+PCF 透過 N15 介面向存取和行動管理功能 (AMF) 執行與接取管理服務相關的政策。存取和行動管理服務支援以下功能：
+
+- 與無線存取技術 (RAT)/頻率選擇優先順序相關的策略決策的執行控制
+- 在終端機 (UE) 中執行服務區限制
+- 為終端啟用位置追蹤功能，以便定期取得使用者目前位置的更新
+
+#### 策略授權
+
+PCF 實現策略授權服務，授權透過 N5 介面發出的應用功能 (AF) 要求。策略授權服務支援以下功能：
+
+根據 AF 的請求，為 PDU Session 建立策略。策略授權服務是 IP 多媒體子系統 (IMS) 整合和動態策略與計費控制 (PCC) 規則創建的關鍵功能。
+
+#### UE 管理服務
+
+PCF 透過 N15 介面向 AMF 執行與使用者裝置 (UE) 管理服務相關的策略。UE 管理服務支援以下功能：
+- 將 UE 路由選擇策略 (URSP) 規則傳送給 UE
+
 
 ### NRF (NF Repository Function)
 
@@ -297,15 +337,6 @@ CHF 透過 Nchf 介面為其他網路元件提供計費服務，確保營運商�
 此外，國外學者也有研究基於 gRPC 的 SBI 服務，詳細資訊可參考 [SBA-gRPC-5G](https://github.com/iithnewslab/SBA-gRPC-5G/blob/master/Presentation_Netsoft19_gRPC_5G.pdf)。
 :::
 
-![alt text](assets/1-1.png)
-*圖：SBI 呼叫流程：資源操作*
-
-![alt text](assets/1-2.png)
-*圖：SBI 呼叫流程：訂閱服務*
-
-![alt text](assets/1-3.png)
-*圖：SBI 呼叫流程：事件通知*
-
 ### 實際案例：AMF 尋找 SMF
 
 若 UE 透過基地台向 AMF 請求建立會議（PDU Session），AMF 要如何在不知道 SMF 確切位址的情況下找到它呢？
@@ -318,6 +349,21 @@ CHF 透過 Nchf 介面為其他網路元件提供計費服務，確保營運商�
 4. AMF 向 NRF 詢問 SMF 的位址（消費 NF Discovery 服務）
 5. AMF 成功取得 SMF 的資訊，消費 SMF 提供的 SMContext 服務
 
+:::spoiler
+
+SBA 常見的三種 pattern：
+
+![alt text](https://raw.githubusercontent.com/ianchen0119/cndi-md/refs/heads/main/assets/1-1.png)
+*圖：SBI 呼叫流程：資源操作*
+
+![alt text](https://raw.githubusercontent.com/ianchen0119/cndi-md/refs/heads/main/assets/1-2.png)
+*圖：SBI 呼叫流程：訂閱服務*
+
+![alt text](https://raw.githubusercontent.com/ianchen0119/cndi-md/refs/heads/main/assets/1-3.png)
+*圖：SBI 呼叫流程：事件通知*
+
+:::
+
 :::info
 每個 NF 提供的 SBI 服務可參考：https://3gpp.sungwoonsong.com/
 3GPP 提供的 OpenAPI 文見可參考：https://github.com/jdegre/5GC_APIs/tree/Rel-18 
@@ -327,5 +373,6 @@ CHF 透過 Nchf 介面為其他網路元件提供計費服務，確保營運商�
 
 - [ ] 閱讀[官方文件](https://free5gc.org/guide/3-install-free5gc/)安裝 free5GC。
 - [ ] 閱讀[官方文件](https://free5gc.org/guide/5-install-ueransim/)，使 UE Simulator 能夠透過核心網路 ping 到 `8.8.8.8`。
-- [ ] 試著修改 SMF 與 UPF 的組態（Configuration）檔案，使 UE 分配到的 IP 從 `10.60.0.0/16` 改為 `10.61.0.0/16`。
+- [ ] 修改 Subscription Data，讓 UE 分配到我們預先設定的 IP（Static IP Pool）。
+- [ ] 試著修改 SMF 與 UPF 的組態（Configuration）檔案，使 UE 分配到的 IP 從 `10.60.0.0/16` 改為 `10.60.1.0/24`。
 
