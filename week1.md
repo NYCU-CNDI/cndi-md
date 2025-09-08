@@ -36,6 +36,13 @@ Syllabus: https://timetable.nycu.edu.tw/?r=main/crsoutline&Acy=114&Sem=1&CrsNo=5
 
 *圖：核心網路架構，可細分為控制平面與傳輸平面*
 
+
+![image](https://hackmd.io/_uploads/SywPkTo5ge.png)
+> Ref: https://www.tech-invite.com/3m23/toc/tinv-3gpp-23-501_c.html
+
+*圖：核心網路 reference point 架構*
+
+
 對於公網來說，其實我們並不會察覺到核心網路的存在。人們在乎大概就是「有沒有吃到飽」、「基地台數量（覆蓋率）」、「我家附近的訊號強度」。
 但對於營運商（電信業者）來說，核心網路對他們就非常有感了，我們可以想像一下自己家是電信業者的話，我們會期待核心網路為我們提供什麼？
 - 管理基地台連線的能力
@@ -142,8 +149,8 @@ UPF 是 5G 核心網路中負責用戶平面功能的網路元件，相當於 4G
 - **使用量報告**：向 SMF 報告用戶資料使用量以支援計費和策略控制
 - **上行流量分流**：支援本地分流（Local Breakout）功能，將特定流量就近處理
 - **下行封包緩衝**：在 UE 處於閒置狀態時暂存下行封包
-- **多歸屬支援**：支援 PDU Session 的多路徑傳輸
-- **邊緣運算支援**：可部署在網路邊緣以降低延遲
+- **支援多路徑**：支援 PDU Session 的多路徑傳輸
+- **支援邊緣運算**：可部署在網路邊緣以降低延遲
 
 UPF 透過 N4 介面接受 SMF 的控制，透過 N3 介面與 RAN 連接，透過 N6 介面與外部資料網路（如網際網路）連接。UPF 的分散式部署特性使其成為支援邊緣運算和超低延遲應用的關鍵元件。
 
@@ -167,9 +174,9 @@ UE -> AMF -> AUSF -> UDM
 ```
 
 :::info
-- 
-AKA（Authentication and Key Agreement）是一種機制，它使行動設備和行 動網路營運商能夠驗證和散佈要在它們之間使用的共享密鑰。
+- AKA（Authentication and Key Agreement）是一種「使行動設備和行動網路營運商能夠驗證和散佈要在它們之間使用的共享密鑰」的機制。
 - Authentication 相關流程請參考 TS 33.501。
+<!-- - https://hackmd.io/Z5_y9dPpRKK1qg7mj741kQ -->
 :::
 
 ### UDM (Unified Data Management)
@@ -199,6 +206,7 @@ UDR 是 5G 核心網路中的統一資料倉庫，負責儲存各種網路和用
 - **資料一致性保證**：確保資料的一致性和完整性
 - **高可用性支援**：支援資料備份和災難恢復
 - **存取控制**：提供細粒度的資料存取控制
+- [free5gc/webconsole](https://github.com/free5gc/webconsole/blob/main/backend/WebUI/model_subs_data.go)
 
 UDR 採用 RESTful API 介面，支援標準的 HTTP 方法（GET、POST、PUT、DELETE、PATCH）進行資料操作。主要的資料存取者包括：
 - **UDM**：存取用戶訂閱資料和認證資料
@@ -372,7 +380,12 @@ SBA 常見的三種 pattern：
 ## 課堂/課後練習
 
 - [ ] 閱讀[官方文件](https://free5gc.org/guide/3-install-free5gc/)安裝 free5GC。
-- [ ] 閱讀[官方文件](https://free5gc.org/guide/5-install-ueransim/)，使 UE Simulator 能夠透過核心網路 ping 到 `8.8.8.8`。
+- [ ] 閱讀[官方文件 UERANSIM](https://free5gc.org/guide/5-install-ueransim/)，使 UE Simulator 能夠透過核心網路 ping 到 `8.8.8.8`，需要至少兩個VM。
+    - [ ] 替代：[官方文件 free-ran-ue](https://alonza0314.github.io/free-ran-ue/doc-user-guide/03-quickstart-free-ran-ue/)，使用namespace方式讓核網跟RAN/UE都跑在同一台上面，如果是MAC(arm)，在build的時候不能用make，要自己下
+        ```go
+        go build -o build/free-ran-ue main.go
+        ```
+        但make ns-up/ns-down還是可以用
 - [ ] 修改 Subscription Data，讓 UE 分配到我們預先設定的 IP（Static IP Pool）。
 - [ ] 試著修改 SMF 與 UPF 的組態（Configuration）檔案，使 UE 分配到的 IP 從 `10.60.0.0/16` 改為 `10.60.1.0/24`。
 
